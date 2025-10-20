@@ -1,97 +1,85 @@
 /*
-====================================================================
-    DESAFIO: Código da Ilha – Edição Free Fire - NÍVEL AVENTUREIRO
-    Aluno: Aderlon Barbosa Pessoa
-    Matéria: Estrutura de Dados
-    Descrição:
-        Este programa é a continuação do desafio do Nível Novato.
-        Agora, além de adicionar, remover e listar itens, também é
-        possível buscar um item específico pelo nome dentro da mochila.
-        O objetivo é treinar o uso de busca sequencial em vetores e o
-        uso da função strcmp() para comparar strings.
-====================================================================
+==============================================================
+DESAFIO Código da Ilha – Edição Free Fire - NÍVEL AVENTUREIRO
+Aluno: Aderlon Barbosa Pessoa
+Matéria: Estrutura de Dados
+Descrição:
+Neste nível, o sistema de mochila virtual é aprimorado para 
+permitir a busca de itens pelo nome. Agora o jogador pode 
+consultar rapidamente se um item está na mochila e visualizar 
+seus detalhes. O programa utiliza busca sequencial com 
+comparação de strings (strcmp) e controle por flag.
+==============================================================
 */
 
 #include <stdio.h>
-#include <string.h>
+#include <string.h> // Necessário para usar strcmp()
 
-// -------------------------------------------------------------------
-// Estrutura que representa um item da mochila
-// Cada item tem um nome, tipo e quantidade
-// -------------------------------------------------------------------
+// Definindo o limite máximo de itens na mochila
+#define MAX_ITENS 10
+
+// Estrutura que representa cada item da mochila
 struct Item {
-    char nome[30];
-    char tipo[20];
+    char nome[50];
+    char tipo[30];
     int quantidade;
 };
 
 int main() {
+    struct Item mochila[MAX_ITENS]; // Vetor que armazena os itens
+    int totalItens = 0;             // Quantidade atual de itens na mochila
+    int opcao;                      // Controle do menu
+    int i;                          // Variável auxiliar para laços
 
-    struct Item mochila[10];   // Vetor estático que guarda até 10 itens
-    int totalItens = 0;        // Conta quantos itens estão na mochila
-    int opcao;                 // Guarda a escolha do usuário
-    char nomeAux[30];          // Usada para remoção e busca
-
-    // -------------------------------------------------------------------
-    // Loop principal do programa - o menu será exibido até o jogador sair
-    // -------------------------------------------------------------------
+    // Laço principal com menu interativo
     do {
-        printf("\n==============================\n");
-        printf(" DESAFIO CÓDIGO DA ILHA - NIVEL AVENTUREIRO\n");
-        printf("==============================\n");
-        printf("1. Adicionar item à mochila\n");
-        printf("2. Remover item da mochila\n");
-        printf("3. Listar itens cadastrados\n");
-        printf("4. Buscar item por nome\n");
+        printf("\n===== MOCHILA DO SOBREVIVENTE - NÍVEL AVENTUREIRO =====\n");
+        printf("1. Adicionar item\n");
+        printf("2. Remover item\n");
+        printf("3. Listar itens\n");
+        printf("4. Buscar item por nome\n"); // NOVA OPÇÃO!
         printf("5. Sair\n");
-        printf("Escolha uma opção: ");
+        printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
-        getchar(); // limpa o buffer
+        getchar(); // Limpa o buffer do teclado
 
-        switch(opcao) {
-
-            // ---------------------------------------------------------------
-            // OPÇÃO 1: Adicionar item à mochila
-            // ---------------------------------------------------------------
+        switch (opcao) {
             case 1:
-                if (totalItens < 10) {
-                    printf("\n--- Adicionar novo item ---\n");
+                // Adicionar novo item na mochila
+                if (totalItens < MAX_ITENS) {
+                    printf("\nDigite o nome do item: ");
+                    fgets(mochila[totalItens].nome, sizeof(mochila[totalItens].nome), stdin);
+                    mochila[totalItens].nome[strcspn(mochila[totalItens].nome, "\n")] = '\0'; // Remove o \n
 
-                    printf("Nome do item: ");
-                    fgets(mochila[totalItens].nome, 30, stdin);
-                    mochila[totalItens].nome[strcspn(mochila[totalItens].nome, "\n")] = '\0';
-
-                    printf("Tipo do item: ");
-                    fgets(mochila[totalItens].tipo, 20, stdin);
+                    printf("Digite o tipo do item: ");
+                    fgets(mochila[totalItens].tipo, sizeof(mochila[totalItens].tipo), stdin);
                     mochila[totalItens].tipo[strcspn(mochila[totalItens].tipo, "\n")] = '\0';
 
-                    printf("Quantidade: ");
+                    printf("Digite a quantidade: ");
                     scanf("%d", &mochila[totalItens].quantidade);
-                    getchar();
+                    getchar(); // Limpa o buffer
 
                     totalItens++;
                     printf("\nItem adicionado com sucesso!\n");
                 } else {
-                    printf("\nA mochila está cheia! (Limite de 10 itens)\n");
+                    printf("\nMochila cheia! Não é possível adicionar mais itens.\n");
                 }
                 break;
 
-            // ---------------------------------------------------------------
-            // OPÇÃO 2: Remover item pelo nome
-            // ---------------------------------------------------------------
             case 2:
+                // Remover item pelo nome
                 if (totalItens > 0) {
-                    printf("\n--- Remover item ---\n");
-                    printf("Digite o nome do item a ser removido: ");
-                    fgets(nomeAux, 30, stdin);
-                    nomeAux[strcspn(nomeAux, "\n")] = '\0';
-
+                    char nomeRemover[50];
                     int encontrado = 0;
 
-                    for (int i = 0; i < totalItens; i++) {
-                        if (strcmp(mochila[i].nome, nomeAux) == 0) {
+                    printf("\nDigite o nome do item a remover: ");
+                    fgets(nomeRemover, sizeof(nomeRemover), stdin);
+                    nomeRemover[strcspn(nomeRemover, "\n")] = '\0';
+
+                    for (i = 0; i < totalItens; i++) {
+                        if (strcmp(mochila[i].nome, nomeRemover) == 0) {
                             for (int j = i; j < totalItens - 1; j++) {
-                                mochila[j] = mochila[j + 1];
+                                mochila[j] = mochila[j + 1]; // Move os itens
                             }
                             totalItens--;
                             encontrado = 1;
@@ -101,86 +89,67 @@ int main() {
                     }
 
                     if (!encontrado) {
-                        printf("\nItem não encontrado!\n");
+                        printf("\nItem não encontrado na mochila.\n");
                     }
-
                 } else {
-                    printf("\nA mochila está vazia, nada para remover.\n");
+                    printf("\nA mochila está vazia.\n");
                 }
                 break;
 
-            // ---------------------------------------------------------------
-            // OPÇÃO 3: Listar todos os itens cadastrados
-            // ---------------------------------------------------------------
             case 3:
+                // Listar todos os itens
                 if (totalItens > 0) {
-                    printf("\n--- Itens na Mochila ---\n");
-                    printf("%-20s %-15s %-10s\n", "NOME", "TIPO", "QUANTIDADE");
-                    printf("-----------------------------------------------\n");
+                    printf("\n======= ITENS NA MOCHILA =======\n");
+                    printf("%-20s %-20s %-10s\n", "Nome", "Tipo", "Quantidade");
+                    printf("---------------------------------------------\n");
 
-                    for (int i = 0; i < totalItens; i++) {
-                        printf("%-20s %-15s %-10d\n",
-                               mochila[i].nome,
-                               mochila[i].tipo,
-                               mochila[i].quantidade);
+                    for (i = 0; i < totalItens; i++) {
+                        printf("%-20s %-20s %-10d\n", mochila[i].nome, mochila[i].tipo, mochila[i].quantidade);
                     }
                 } else {
                     printf("\nA mochila está vazia!\n");
                 }
                 break;
 
-            // ---------------------------------------------------------------
-            // OPÇÃO 4: Buscar item pelo nome (NOVIDADE DO NÍVEL AVENTUREIRO)
-            // ---------------------------------------------------------------
             case 4:
+                // Buscar item pelo nome (nova função do nível Aventureiro)
                 if (totalItens > 0) {
-                    printf("\n--- Buscar item ---\n");
-                    printf("Digite o nome do item que deseja procurar: ");
-                    fgets(nomeAux, 30, stdin);
-                    nomeAux[strcspn(nomeAux, "\n")] = '\0';
+                    char nomeBusca[50];
+                    int encontrado = 0;
 
-                    int encontrado = 0; // flag que vai dizer se o item foi encontrado
+                    printf("\nDigite o nome do item a buscar: ");
+                    fgets(nomeBusca, sizeof(nomeBusca), stdin);
+                    nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
 
-                    // Busca sequencial: percorre todos os itens comparando os nomes
-                    for (int i = 0; i < totalItens; i++) {
-                        if (strcmp(mochila[i].nome, nomeAux) == 0) {
+                    for (i = 0; i < totalItens; i++) {
+                        if (strcmp(mochila[i].nome, nomeBusca) == 0) {
                             printf("\nItem encontrado!\n");
-                            printf("--------------------------\n");
                             printf("Nome: %s\n", mochila[i].nome);
                             printf("Tipo: %s\n", mochila[i].tipo);
                             printf("Quantidade: %d\n", mochila[i].quantidade);
-                            printf("--------------------------\n");
                             encontrado = 1;
                             break;
                         }
                     }
 
                     if (!encontrado) {
-                        printf("\nO item '%s' não foi encontrado na mochila.\n", nomeAux);
+                        printf("\nItem não encontrado na mochila. Tente outro nome!\n");
                     }
-
                 } else {
-                    printf("\nA mochila está vazia! Nada para buscar.\n");
+                    printf("\nA mochila está vazia!\n");
                 }
                 break;
 
-            // ---------------------------------------------------------------
-            // OPÇÃO 5: Sair do sistema
-            // ---------------------------------------------------------------
             case 5:
-                printf("\nSaindo do sistema... Continue sua jornada, aventureiro!\n");
+                printf("\nSaindo do programa... Até a próxima aventura!\n");
                 break;
 
-            // ---------------------------------------------------------------
-            // OPÇÃO INVÁLIDA
-            // ---------------------------------------------------------------
             default:
                 printf("\nOpção inválida! Tente novamente.\n");
+                break;
         }
 
-    } while (opcao != 5); // repete enquanto o jogador não escolher sair
+    } while (opcao != 5); // O programa continua até o jogador escolher sair
 
-    printf("\nPrograma encerrado com sucesso.\n");
     return 0;
 }
-
